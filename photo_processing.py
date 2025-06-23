@@ -4,6 +4,7 @@ import os
 import os.path
 from PIL import Image
 from io import BytesIO
+from datetime import datetime
 
 # --- AWS クライアント/リソースの初期化 ---
 s3 = boto3.client('s3')
@@ -16,10 +17,13 @@ def lambda_handler(event, context):
     サムネイルの生成・切り出し後にS3とDynamoDBへアップロードする。
     """
 
-    # Lambda 環境変数の読み込み
-    BUCKET_NAME = os.environ['BUCKET_NAME'] # 元画像が入っているS3バケット
-    THUMBNAIL_BUCKET_NAME = os.environ['THUMBNAIL_BUCKET_NAME'] # サムネイルを保存するS3バケット
-    PHOTO_TABLE_NAME = os.environ['PHOTO_TABLE_NAME'] # DynamoDBテーブル名
+    # Lambda 環境変数の読み込み - ここを修正
+    # 元画像が入っているS3バケット
+    BUCKET_NAME = os.environ['main_picture_bucket'] 
+    # サムネイルを保存するS3バケット
+    THUMBNAIL_BUCKET_NAME = os.environ['samneil_picture_bucket'] 
+    # DynamoDBテーブル名
+    PHOTO_TABLE_NAME = os.environ['picture_table'] 
 
     # DynamoDBテーブルオブジェクトを取得
     table = dynamodb.Table(PHOTO_TABLE_NAME)
@@ -80,19 +84,32 @@ def lambda_handler(event, context):
 
         # サムネイル画像を別バケットにアップロード
         thumbnail_name = f"thumbnail-{file_name}"
-        # S3にアップロード
-        
-            
-            
-            
-        
+        try:
+            s3.put_object(
+                Bucket=THUMBNAIL_BUCKET_NAME,
+                Key=thumbnail_name,
+                Body=buffer,
+                ContentType=f"image/{out_format.lower()}"
+            )
+            print(f"Successfully uploaded thumbnail {thumbnail_name} to {THUMBNAIL_BUCKET_NAME}")
+        except Exception as e:
+            print(f"Error uploading thumbnail {thumbnail_name}: {e}")
+            raise
 
         # DynamoDB にメタデータ保存
-        
-            
-            
-            
-        
+        try:
+            table.put_item(
+                Item={
+                    'picture_Id': photo_id,              # SQSメッセージからの photo_id
+                    'picture_names': file_name,          # 元画像のファイル名
+                    '3bucket_name': THUMBNAIL_BUCKET_NAME, # サムネイルが保存されたバケット名
+                    'upload_date': datetime.now().isoformat() # 現在の日時
+                }
+            )
+            print(f"Successfully saved metadata for picture_Id {photo_id} to {PHOTO_TABLE_NAME}")
+        except Exception as e:
+            print(f"Error saving metadata for picture_Id {photo_id}: {e}")
+            raise
 
     return {
         'statusCode': 200,
