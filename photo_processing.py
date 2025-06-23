@@ -4,10 +4,7 @@ import os
 import os.path
 from PIL import Image
 from io import BytesIO
-<<<<<<< HEAD
 from datetime import datetime
-=======
->>>>>>> test_tonkothu0623
 
 # --- AWS クライアント/リソースの初期化 ---
 s3 = boto3.client('s3')
@@ -19,21 +16,10 @@ def lambda_handler(event, context):
     受け取ったメッセージ内にあるファイル名を元に画像を取得し、
     サムネイルの生成・切り出し後にS3とDynamoDBへアップロードする。
     """
-
-<<<<<<< HEAD
-    # Lambda 環境変数の読み込み - ここを修正
-    # 元画像が入っているS3バケット
-    BUCKET_NAME = os.environ['main_picture_bucket'] 
-    # サムネイルを保存するS3バケット
-    THUMBNAIL_BUCKET_NAME = os.environ['samneil_picture_bucket'] 
-    # DynamoDBテーブル名
-    PHOTO_TABLE_NAME = os.environ['picture_table'] 
-=======
-    # Lambda 環境変数の読み込み
+   
     BUCKET_NAME = os.environ['BUCKET_NAME'] # 元画像が入っているS3バケット
     THUMBNAIL_BUCKET_NAME = os.environ['THUMBNAIL_BUCKET_NAME'] # サムネイルを保存するS3バケット
     PHOTO_TABLE_NAME = os.environ['PHOTO_TABLE_NAME'] # DynamoDBテーブル名
->>>>>>> test_tonkothu0623
 
     # DynamoDBテーブルオブジェクトを取得
     table = dynamodb.Table(PHOTO_TABLE_NAME)
@@ -94,7 +80,7 @@ def lambda_handler(event, context):
 
         # サムネイル画像を別バケットにアップロード
         thumbnail_name = f"thumbnail-{file_name}"
-<<<<<<< HEAD
+
         try:
             s3.put_object(
                 Bucket=THUMBNAIL_BUCKET_NAME,
@@ -121,22 +107,7 @@ def lambda_handler(event, context):
         except Exception as e:
             print(f"Error saving metadata for picture_Id {photo_id}: {e}")
             raise
-=======
-        # S3にアップロード
-        
             
-            
-            
-        
-
-        # DynamoDB にメタデータ保存
-        
-            
-            
-            
-        
->>>>>>> test_tonkothu0623
-
     return {
         'statusCode': 200,
         'headers': {'Access-Control-Allow-Origin': '*'},
