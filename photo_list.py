@@ -17,6 +17,9 @@ def lambda_handler(event, context):
     """
 
     # --- (1) 環境変数の取得 ---
+    PHOTO_TABLE_NAME = os.environ['picture_table']           # DynamoDBテーブル名
+    THUMBNAIL_BUCKET_NAME = os.environ['samneil_picture_bucket'] # サムネイル用S3バケット
+    ORIGINAL_BUCKET_NAME = os.environ['main_picture_bucket'] # オリジナル画像を保管しているS3バケット
 
 
     # --- (2) 署名付きURL生成用のS3クライアント ---
