@@ -1,0 +1,1 @@
+photo_delete.py
