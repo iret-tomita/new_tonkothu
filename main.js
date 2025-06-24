@@ -2,7 +2,7 @@
 /* 1) API エンドポイント設定                      */
 /**************************************************/
 const apiUploadEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/UPLOAD"; // TODO: 実際のAPIエンドポイントに置き換える
-const apiGetPhotosEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/GET_FULL"; // TODO: 実際のAPIエンドポイントに置き換える
+const apiGetPhotosEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/GET_IDL"; // TODO: 実際のAPIエンドポイントに置き換える
 // const apiDeleteEndpoint = "APIGatewayエンドポイント";
 // const apiLikeEndpoint = "APIGatewayエンドポイント";
 
