@@ -87,20 +87,28 @@ def lambda_handler(event, context):
                         'error': str(e)
                     })
 
+
     except Exception as e:
-        logger.error(f"Error processing photo_id {photo_id}: {str(e)}")
-        results.append({
-            'status': 'error',
-            'photo_id': photo_id,
-            'file_name': file_name,
-            'error': str(e)
-        })
-
-
-
-            return {
-            'statusCode': 200,
-            'body': json.dumps(f'{file_name} deleted successfully')
+        logger.error(f"Critical error in lambda_handler: {str(e)}")
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': 'Internal server error'})
         }
 
-
+  # 処理結果の統計
+    success_count = len([r for r in results if r.get('status') == 'success'])
+    error_count = len([r for r in results if r.get('status') == 'error'])
+    
+    # 正常終了時のreturn（全ての処理が完了した後）
+    return {
+        'statusCode': 200 if error_count == 0 else 207,  # 部分的エラーの場合は207 Multi-Status
+        'body': json.dumps({
+            'message': 'Processing completed',
+            'summary': {
+                'total_processed': len(results),
+                'successful': success_count,
+                'failed': error_count
+            },
+            'results': results
+        })
+    }
