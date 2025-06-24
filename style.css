@@ -1,0 +1,478 @@
+:root {
+  /* 全体のフォント設定をOsakaに変更 */
+  font-family: Osaka, 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'メイリオ', Meiryo, sans-serif; /* Osaka を最優先 */
+  line-height: 1.6;
+  font-weight: 400;
+
+  /* 豚骨ラーメンのメインカラー (画像に合わせて調整) */
+  --color-base-cream: #FFEFD3; /* 全体背景のクリーム/黄色がかった色 */
+  --color-header-bg: #FFE4AC; /* ヘッダー/アップロードセクションの背景色 */
+  --color-text-dark: #5C3D2F; /* 濃いテキスト/メインの茶色 */
+  --color-upload-button-bg: #CC4C3C; /* アップロードボタンの赤色 */
+  --color-upload-button-hover: #E05C4C; /* アップロードボタンのホバー色 */
+  --color-accent-red: #D82F2F; /* 紅ショウガのようなアクセントレッド (削除ボタンなどに) */
+  --color-soft-white: #FFFCF7; /* 写真一覧セクションなどの明るい白 */
+
+  /* ★追加：豚骨ラーメンの他のカラーもここで定義（もし必要であれば）★ */
+  --color-tonkotsu-noodle: #F9E076; /* 麺の色 */
+  --color-tonkotsu-chashu: #A04A2F; /* チャーシューの色 */
+  --color-tonkotsu-soup-medium: #F5D7A9; /* スープの中間色 */
+
+
+  background-color: var(--color-base-cream); /* 全体の背景 */
+  color: var(--color-text-dark); /* デフォルトのテキスト色 */
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.header {
+  background-color: var(--color-header-bg); /* ヘッダーを画像の色に */
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  /* flexコンテナとして、中央寄せする */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem; /* アイコンとコンテンツの間隔 */
+}
+
+.header-content {
+  display: flex; /* アイコンとH1を横並びにする */
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  font-size: 2.2rem; /* アイコンのサイズ */
+  color: var(--color-text-dark); /* アイコンの色 */
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.2rem; /* タイトルを大きく */
+  font-weight: 700; /* 太くする */
+  color: var(--color-text-dark); /* ヘッダーテキストを濃い色に */
+}
+
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.upload-section {
+  background-color: var(--color-header-bg); /* 画像に合わせてヘッダーと同じ背景色に */
+  padding: 2.5rem 2rem; /* パディングを増やす */
+  border-radius: 1.5rem; /* 角丸をさらに大きく */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* 影を強く、立体的に */
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column; /* 要素を縦に並べる */
+  align-items: center; /* 水平中央 */
+  gap: 1.5rem; /* 要素間の間隔を調整 */
+}
+
+/* メインのアップロードボタンのスタイルを画像に合わせる */
+.upload-button { /* IDではなくクラスで指定 */
+  background-color: var(--color-upload-button-bg); /* 赤っぽいボタン色 */
+  color: var(--color-soft-white); /* 白いテキスト */
+  border: none;
+  padding: 1.5rem 3rem; /* ボタンを大きく */
+  border-radius: 2rem; /* かなり強めの角丸 */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.8rem; /* テキストを大きく */
+  font-weight: 700; /* テキストを太く */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* 強めの影 */
+  display: flex; /* アイコンとテキストを横並びにするため */
+  align-items: center;
+  justify-content: center; /* アイコンとテキストを中央揃え */
+  gap: 1rem; /* アイコンとテキストの間隔 */
+  width: auto; /* 幅は内容に合わせる */
+  min-width: 280px; /* ある程度の最小幅を確保 */
+  max-width: 100%; /* 親要素からはみ出さないように */
+  margin-top: 0; /* リセット */
+}
+
+.upload-button:hover {
+  background-color: var(--color-upload-button-hover); /* ホバー色 */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* ホバー時の影をさらに強く */
+  transform: translateY(-3px); /* 少し大きく浮き上がる */
+}
+
+.upload-button:disabled {
+  background-color: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ★「＋ 写真を選択」とファイル名表示関連のスタイルは維持しつつ、配置を調整★ */
+.file-input-container {
+  display: flex;
+  flex-direction: column; /* 縦に並べる */
+  gap: 0.75rem;
+  margin-bottom: 0; /* upload-sectionのgapで制御 */
+  align-items: center; /* 中央寄せ */
+  width: 100%; /* 親要素の幅に合わせる */
+}
+
+/* custom-file-button は 「＋ 写真を選択」ボタン */
+.custom-file-button {
+  background-color: var(--color-tonkotsu-noodle); /* 麺の色 */
+  color: var(--color-tonkotsu-chashu); /* チャーシューの色 */
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem; /* より可愛い丸み */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: auto; /* 幅を内容に合わせる */
+  min-width: 180px; /* ある程度の最小幅 */
+  margin-top: 0; /* リセット */
+}
+
+.custom-file-button:hover {
+  background-color: var(--color-tonkotsu-soup-medium);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.selected-file-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 300px; /* サイズ調整 */
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  color: var(--color-text-dark);
+  background-color: var(--color-soft-white); /* 白系の背景に */
+  border: 1px solid var(--color-tonkotsu-noodle);
+  border-radius: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.selected-file-name {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  margin-right: 0.75rem;
+}
+
+.clear-selection-button {
+  background-color: transparent;
+  color: var(--color-tonkotsu-chashu);
+  border: none;
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.clear-selection-button:hover {
+  color: var(--color-accent-red);
+  transform: scale(1.1);
+  background-color: rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+}
+
+.hidden-element {
+  display: none !important;
+}
+
+
+.photos-section {
+  background-color: var(--color-soft-white);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.photos-section h2 {
+  margin-top: 0;
+  color: var(--color-text-dark);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.photo-item {
+  position: relative;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.5rem;
+  background-color: var(--color-soft-white);
+  overflow: hidden;
+}
+
+.photo-item img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.photo-item:hover img {
+  transform: scale(1.03);
+}
+
+.delete-button {
+  background-color: var(--color-accent-red);
+  color: var(--color-soft-white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background-color: #E64040;
+  transform: translateY(-1px);
+}
+
+.action-area,
+.action-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 0.75rem;
+  padding: 0 1rem 1rem;
+}
+
+.like-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.like-button {
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  background-color: var(--color-base-cream);
+  color: var(--color-text-dark);
+  transition: all 0.2s ease;
+}
+
+.like-button:hover {
+  background-color: var(--color-header-bg);
+  transform: translateY(-1px);
+}
+
+.like-count {
+  font-weight: bold;
+  color: var(--color-text-dark);
+  font-size: 1rem;
+}
+
+@media (min-width: 640px) {
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .photo-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .photo-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-base-cream-dark: #2F241F;
+    --color-header-bg-dark: #3F322B;
+    --color-text-light-dark: #E0D7CD;
+    --color-upload-button-bg-dark: #A83A2E;
+    --color-upload-button-hover-dark: #B94C3F;
+    --color-accent-red-dark: #B02828;
+
+    background-color: var(--color-base-cream-dark);
+    color: var(--color-text-light-dark);
+  }
+
+  .header {
+    background-color: var(--color-header-bg-dark);
+  }
+  .header-icon,
+  .header h1 {
+    color: var(--color-text-light-dark);
+  }
+
+  .upload-section {
+    background-color: var(--color-header-bg-dark);
+  }
+  .upload-button {
+    background-color: var(--color-upload-button-bg-dark);
+    color: var(--color-soft-white);
+  }
+  .upload-button:hover {
+    background-color: var(--color-upload-button-hover-dark);
+  }
+
+  /* 「＋ 写真を選択」とファイル名表示関連のダークモードスタイル */
+  .custom-file-button {
+    background-color: #5A5046;
+    color: var(--color-text-light-dark);
+  }
+  .custom-file-button:hover {
+    background-color: #6E5C4E;
+  }
+  .selected-file-display {
+    background-color: #4A3C35;
+    border: 1px solid #6E5C4E;
+  }
+  .selected-file-name {
+    color: var(--color-text-light-dark);
+  }
+  .clear-selection-button {
+    color: var(--color-text-light-dark);
+  }
+  .clear-selection-button:hover {
+    color: var(--color-accent-red-dark);
+  }
+
+
+  .photos-section {
+    background-color: #3F322B;
+  }
+  .photos-section h2 {
+    color: var(--color-text-light-dark);
+  }
+
+  .photo-item {
+    background-color: #3F322B;
+  }
+
+  .delete-button {
+    background-color: var(--color-accent-red-dark);
+    color: var(--color-soft-white);
+  }
+  .delete-button:hover {
+    background-color: #C03030;
+  }
+
+  .like-button {
+    background-color: var(--color-base-cream-dark);
+    color: var(--color-text-light-dark);
+  }
+  .like-button:hover {
+    background-color: var(--color-header-bg-dark);
+  }
+
+  .like-count {
+    color: var(--color-text-light-dark);
+  }
+
+  #modalContent {
+    background: #3F322B;
+    color: var(--color-text-light-dark);
+  }
+  #modalCloseBtn {
+    background: var(--color-header-bg-dark);
+    color: var(--color-text-light-dark);
+  }
+  #modalCloseBtn:hover {
+    background-color: var(--color-base-cream-dark);
+  }
+}
+
+/* ======================== */
+/* 画像拡大用モーダルのCSS  */
+/* ======================== */
+#modalContainer {
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#modalContent {
+  background: var(--color-soft-white);
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+#modalCloseBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+  font-size: 1.6rem;
+  font-weight: bold;
+  background: var(--color-header-bg);
+  border-radius: 50%;
+  padding: 0.4rem 0.8rem;
+  color: var(--color-text-dark);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+#modalCloseBtn:hover {
+    background-color: var(--color-base-cream);
+    transform: scale(1.1);
+}
+
+
+#modalImg {
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 0.75rem;
+}
