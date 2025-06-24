@@ -1,10 +1,8 @@
-// JSファイル全体を貼り付けます
-
 /**************************************************/
 /* 1) API エンドポイント設定                      */
 /**************************************************/
-const apiUploadEndpoint = "API Gatewayエンドポイント（必須機能）"; // TODO: 実際のAPIエンドポイントに置き換える
-const apiGetPhotosEndpoint = "API Gatewayエンドポイント（必須機能）"; // TODO: 実際のAPIエンドポイントに置き換える
+const apiUploadEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/UPLOAD"; // TODO: 実際のAPIエンドポイントに置き換える
+const apiGetPhotosEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/GET_FULL"; // TODO: 実際のAPIエンドポイントに置き換える
 // const apiDeleteEndpoint = "APIGatewayエンドポイント";
 // const apiLikeEndpoint = "APIGatewayエンドポイント";
 
@@ -142,8 +140,8 @@ function updatePhotoGrid(photos) {
     const actionBar = document.createElement("div");
     actionBar.className = "action-bar";
 
-    // いいね関連 (コメントアウトされたまま)
-    /*
+    //いいね関連
+    
     const likeContainer = document.createElement("div");
     likeContainer.className = "like-container";
 
@@ -163,10 +161,9 @@ function updatePhotoGrid(photos) {
 
     likeContainer.appendChild(likeButton);
     likeContainer.appendChild(likeCountEl);
-    */
+    
 
-    // 削除ボタン (コメントアウトされたまま)
-    /*
+    // 削除ボタン 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "削除";
     deleteButton.className = "delete-button";
@@ -175,7 +172,7 @@ function updatePhotoGrid(photos) {
     } else {
       deleteButton.addEventListener("click", () => deletePhoto(photo.photo_id));
     }
-    */
+  
 
     // actionBar.appendChild(likeContainer);
     // actionBar.appendChild(deleteButton);
@@ -212,9 +209,9 @@ async function deletePhoto(photo_id) {
 */
 
 /**************************************************/
-/* 7) いいねボタン (POST /photos/{photo_id}/like) (コメントアウトされたまま) */
+/* 7) いいねボタン (POST /photos/{photo_id}/like) 
 /**************************************************/
-/*
+
 async function handleLike(photo_id) {
   try {
     const response = await fetch(`${apiLikeEndpoint}${photo_id}/like`, {
@@ -235,7 +232,7 @@ async function handleLike(photo_id) {
     alert("いいねに失敗しました");
   }
 }
-*/
+
 
 /**************************************************/
 /* 8) 拡大表示 (モーダル)                         */
