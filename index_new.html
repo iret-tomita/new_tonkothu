@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>写真共有アプリ</title>
+  <link rel="stylesheet" href="style.css">
+  </head>
+
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <img src="images/tonkotu_icon.png" alt="豚骨ラーメンアイコン" class="header-icon-image">
+        <h1>写真共有アプリ</h1>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="upload-section">
+        <div class="file-input-container">
+          <input type="file" id="photoInput" accept="image/*" class="hidden-file-input" />
+          <button id="selectPhotoButton" class="custom-file-button">
+            ＋ 写真を選択
+          </button>
+          <div id="selectedFileDisplay" class="selected-file-display hidden-element">
+            <span id="selectedFileName" class="selected-file-name"></span>
+            <button id="clearSelectionButton" class="clear-selection-button">×</button>
+          </div>
+        </div>
+        <button id="uploadButton" class="upload-button hidden-element">
+          アップロード
+        </button>
+      </section>
+
+      <section class="photos-section">
+        <h2>写真一覧</h2>
+        <div id="photoGrid" class="photo-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modalContainer">
+    <div id="modalContent">
+      <span id="modalCloseBtn">X</span>
+      <img id="modalImg" src="" alt="拡大画像" />
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+
+</html>
