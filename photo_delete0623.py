@@ -11,10 +11,9 @@ def lambda_handler(event, context):
     ORIGINAL_BUCKET_NAME = os.environ.get('ORIGINAL_BUCKET_NAME')
     THUMBNAIL_BUCKET_NAME = os.environ.get('THUMBNAIL_BUCKET_NAME')
     PHOTO_TABLE_NAME = os.environ.get('PHOTO_TABLE_NAME')
-    PICTURE_QUEUE_URL = os.environ.get('PICTURE_QUEUE_URL')
-    results = []  # ← これを追加
+    results = []  
     #「必要な設定情報がすべて揃っているかをチェックする」処理
-    if not all([ORIGINAL_BUCKET_NAME, THUMBNAIL_BUCKET_NAME, PHOTO_TABLE_NAME, PICTURE_QUEUE_URL]):
+    if not all([ORIGINAL_BUCKET_NAME, THUMBNAIL_BUCKET_NAME, PHOTO_TABLE_NAME]):
        logger.error("Required environment variables are missing")
        return {
         'statusCode': 500,
@@ -25,7 +24,6 @@ def lambda_handler(event, context):
     try:
         s3 = boto3.client('s3')
         dynamodb = boto3.resource('dynamodb')
-        sqs = boto3.client('sqs')
         table = dynamodb.Table(PHOTO_TABLE_NAME)
 
 
@@ -59,16 +57,7 @@ def lambda_handler(event, context):
                     #DynamoDBレコード削除
                     table.delete_item(Key={'photo_id': photo_id})
                     logger.info(f"Deleted from DynamoDB: {photo_id}")
-                    # SQS通知（任意）
-                    sqs.send_message(
-                        QueueUrl=PICTURE_QUEUE_URL,
-                        MessageBody=json.dumps({
-                            'action': 'delete',
-                            'photo_id': photo_id,
-                            'file_name': file_name
-                        })
-                    )
-                    logger.info(f"Sent SQS notification for: {photo_id}")
+
 
                     #「処理が成功したことを記録する」処理です。
                     results.append({
@@ -77,7 +66,7 @@ def lambda_handler(event, context):
                         'file_name': file_name
                     })
 
-                #ここからがよくわからん。
+                #写真削除作業で問題が起きた時の対処法
                 except Exception as e:
                     logger.error(f"Error processing photo_id {photo_id}: {str(e)}")
                     results.append({
@@ -95,7 +84,7 @@ def lambda_handler(event, context):
             'body': json.dumps({'error': 'Internal server error'})
         }
 
-  # 処理結果の統計
+  # プログラム全体で致命的な問題が起きた時の緊急対応
     success_count = len([r for r in results if r.get('status') == 'success'])
     error_count = len([r for r in results if r.get('status') == 'error'])
     
