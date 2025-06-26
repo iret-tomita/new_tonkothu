@@ -1,16 +1,20 @@
 /**************************************************/
 /* 1) API エンドポイント設定                      */
 /**************************************************/
-const apiUploadEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/First/upload"; 
-const apiGetPhotosEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/First/get"; 
-// const apiDeleteEndpoint = "APIGatewayエンドポイント";
-// const apiLikeEndpoint = "APIGatewayエンドポイント";
+
+const apiUploadEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/First/upload";
+
+const apiGetPhotosEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/First/get";
+
+const apiDeleteEndpoint = "https://6je5ay7ocb.execute-api.ap-northeast-1.amazonaws.com/First/delete";
+
+const apiLikeEndpoint = "";
 
 /**************************************************/
 /* 2) 変数・定数                                  */
 /**************************************************/
-let isFetching = false;
-let lastFetchTime = 0;
+let isFetching = false; // サムネイル取得中のフラグ
+let lastFetchTime = 0;  // 最終サムネイル取得時刻（連打防止用）
 
 /**************************************************/
 /* 3) 写真アップロード処理                        */
@@ -18,8 +22,6 @@ let lastFetchTime = 0;
 async function handlePhotoUpload() {
   const fileInput = document.getElementById("photoInput");
   const uploadButton = document.getElementById("uploadButton");
-  const selectedFileDisplay = document.getElementById("selectedFileDisplay");
-  const selectedFileNameSpan = document.getElementById("selectedFileName");
   const file = fileInput.files[0];
 
   if (!file) {
@@ -30,10 +32,9 @@ async function handlePhotoUpload() {
 
   // アップロードボタンを無効化（処理中を示すため）
   uploadButton.disabled = true;
-  // ボタンテキストとアイコンを処理中表示に変更
+  // ボタンテキストを処理中表示に変更（Font AwesomeのアイコンはCSSで代替するか、HTMLから削除）
   const originalButtonHtml = uploadButton.innerHTML; // 元のHTMLを保存
-  uploadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> アップロード中...';
-
+  uploadButton.textContent = "アップロード中..."; // テキストのみ変更
 
   const reader = new FileReader();
   reader.onload = async (e) => {
@@ -43,17 +44,17 @@ async function handlePhotoUpload() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          imageData: imageData.split(",")[1],
+          imageData: imageData.split(",")[1], // "data:image/jpeg;base64," の部分を除去
           original_filename: file.name,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("アップロードに失敗しました");
+        throw new Error(`サーバーエラー: ${response.statusText}`);
       }
       alert("アップロード成功！");
 
-      // リスト再取得を少し遅らせる
+      // リスト再取得を少し遅らせる（サムネイル生成完了を待つため）
       setTimeout(() => {
         fetchThumbnails();
       }, 2000);
@@ -62,17 +63,14 @@ async function handlePhotoUpload() {
 
     } catch (error) {
       console.error("アップロードエラー:", error);
-      alert("アップロードに失敗しました。");
+      alert("アップロードに失敗しました。\n" + error.message); // エラーメッセージを表示
       resetUploadUI(); // エラー時もUIを初期状態にリセット
     } finally {
-      // finallyブロックでは、ボタンの表示状態は resetUploadUI() で処理されるため、
-      // ここでは元のHTMLに戻す必要はありません。
-      // もし resetUploadUI() を呼び出さないパスがある場合のために残すことも検討
-      // uploadButton.disabled = false;
-      // uploadButton.innerHTML = originalButtonHtml;
+      // 処理が完了したら、ボタンのテキストを元に戻す
+      uploadButton.innerHTML = originalButtonHtml;
     }
   };
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(file); // ファイルをBase64データURIとして読み込む
 }
 
 /**************************************************/
@@ -94,13 +92,13 @@ async function fetchThumbnails() {
       headers: { "Content-Type": "application/json" },
     });
     if (!response.ok) {
-      throw new Error("サーバーエラー");
+      throw new Error(`サーバーエラー: ${response.statusText}`);
     }
 
     const data = await response.json();
     console.log("GET /photos レスポンス:", data);
 
-    // data.thumbnails = [ { photo_id, thumbnail_url, likes }, ... ] と想定
+    // data.thumbnails = [ { photo_id, thumbnail_url, original_url, likes }, ... ] と想定
     if (!data.thumbnails || data.thumbnails.length === 0) {
       console.warn("DynamoDBからのサムネイルデータが空です");
       updatePhotoGrid([]); // 一覧をクリア
@@ -110,74 +108,88 @@ async function fetchThumbnails() {
     updatePhotoGrid(data.thumbnails);
   } catch (error) {
     console.error("サムネイル一覧の取得エラー:", error);
+    alert("写真一覧の取得に失敗しました。\n" + error.message);
   } finally {
     isFetching = false;
   }
 }
 
 /**************************************************/
-/* 5) 写真をグリッドに追加 (削除ボタン右側配置)   */
+/* 5) 写真をグリッドに追加                        */
 /**************************************************/
 function updatePhotoGrid(photos) {
   const photoGrid = document.getElementById("photoGrid");
-  photoGrid.innerHTML = "";
+  photoGrid.innerHTML = ""; // 既存の要素をクリア
 
-  photos.forEach((photo, index) => {
-    console.log(`photo #${index}:`, photo);
-
+  photos.forEach((photo) => { // indexは不要なので削除
     const photoItem = document.createElement("div");
     photoItem.className = "photo-item";
 
-    // 画像
+    // --- 画像コンテナと画像要素 ---
+    const imgContainer = document.createElement("div");
+    imgContainer.className = "photo-item-image-container"; // CSSで定義するクラス
+
     const img = document.createElement("img");
-    img.src = photo.thumbnail_url;
+    img.src = photo.thumbnail_url; // サムネイルURLを使用
     img.alt = "投稿された写真";
+    img.addEventListener("click", () => showModal(photo.original_url)); // クリックで拡大表示
+    imgContainer.appendChild(img);
 
-    // 画像クリック -> モーダル拡大表示
-    img.addEventListener("click", () => showModal(photo.original_url));
-
-    // アクションバー
+    // --- アクションバー ---
     const actionBar = document.createElement("div");
     actionBar.className = "action-bar";
 
-    //いいね関連
-    
+    // --- いいね関連 ---
     const likeContainer = document.createElement("div");
     likeContainer.className = "like-container";
 
     const likeButton = document.createElement("button");
-    likeButton.textContent = "👍";
+    // いいねアイコンの初期状態 (Font AwesomeをHTML側で使用しないため、👍マークを使用)
+    // 💡 Font Awesomeを再度使う場合は、HTMLの<link>を有効化し、`<i>`タグに`fas fa-thumbs-up`クラスを付与
+    likeButton.innerHTML = '<span class="like-icon">👍</span>'; // HTMLエンティティまたはFont Awesomeアイコン
+
     likeButton.className = "like-button";
-    if (!photo.photo_id) {
+    if (!photo.photo_id) { // photo_idがない場合は無効化
       likeButton.disabled = true;
     } else {
-      likeButton.addEventListener("click", () => handleLike(photo.photo_id));
+      
+      if (photo.likes && photo.likes > 0) {
+          likeButton.querySelector('.like-icon').classList.add('liked');
+      }
+
+      likeButton.addEventListener("click", (event) => {
+        event.stopPropagation(); // 親要素（画像）へのクリックイベント伝播を停止
+        handleLike(photo.photo_id, likeButton); // photo_idとボタン要素を渡す
+      });
     }
 
     const likeCountEl = document.createElement("span");
     likeCountEl.id = `likeCount-${photo.photo_id}`;
     likeCountEl.className = "like-count";
-    likeCountEl.textContent = photo.likes != null ? photo.likes : 0;
+    likeCountEl.textContent = photo.likes != null ? photo.likes : 0; // nullの場合は0を表示
 
     likeContainer.appendChild(likeButton);
     likeContainer.appendChild(likeCountEl);
-    
 
-    // 削除ボタン 
+    // --- 削除ボタン ---
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "削除";
-    deleteButton.className = "delete-button";
-    if (!photo.photo_id) {
+    deleteButton.className = "delete-button"; // CSSで赤色を定義
+    if (!photo.photo_id) { // photo_idがない場合は無効化
       deleteButton.disabled = true;
     } else {
-      deleteButton.addEventListener("click", () => deletePhoto(photo.photo_id));
+      deleteButton.addEventListener("click", (event) => {
+        event.stopPropagation(); // 親要素（画像）へのクリックイベント伝播を停止
+        deletePhoto(photo.photo_id);
+      });
     }
-  
 
-    // actionBar.appendChild(likeContainer);
-    // actionBar.appendChild(deleteButton);
+    // --- アクションバーに要素を追加 ---
+    actionBar.appendChild(likeContainer);
+    actionBar.appendChild(deleteButton);
 
-    photoItem.appendChild(img);
+    // --- photoItemに全てを追加 ---
+    photoItem.appendChild(imgContainer);
     photoItem.appendChild(actionBar);
 
     photoGrid.appendChild(photoItem);
@@ -185,54 +197,60 @@ function updatePhotoGrid(photos) {
 }
 
 /**************************************************/
-/* 6) 個別写真削除処理 (コメントアウトされたまま) */
+/* 6) 個別写真削除処理                             */
 /**************************************************/
-/*
 async function deletePhoto(photo_id) {
   if (!confirm("この写真を削除してよろしいですか？")) {
     return;
   }
   try {
-    const response = await fetch(apiDeleteEndpoint + photo_id, {
+    // API GatewayのURLにphoto_idをパスとして含める
+    const response = await fetch(`${apiDeleteEndpoint}${photo_id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      throw new Error("サーバーでエラーが発生しました");
+      throw new Error(`サーバーエラー: ${response.statusText}`);
     }
     alert("写真を削除しました");
-    fetchThumbnails();
+    fetchThumbnails(); // 削除後、一覧を再取得
   } catch (error) {
     console.error("削除エラー:", error);
-    alert("削除に失敗しました");
+    alert("削除に失敗しました。\n" + error.message);
   }
 }
-*/
 
 /**************************************************/
-/* 7) いいねボタン (POST /photos/{photo_id}/like) 
+/* 7) いいねボタン (POST /photos/{photo_id}/like) */
 /**************************************************/
-
-async function handleLike(photo_id) {
+async function handleLike(photo_id, buttonElement) {
   try {
-    const response = await fetch(`${apiLikeEndpoint}${photo_id}/like`, {
+    // API GatewayのURLにphoto_idをパスとして含める
+    const response = await fetch(`${apiLikeEndpoint}${photo_id}/like`, { // "/like" パスを追加
       method: "POST",
     });
     if (!response.ok) {
-      throw new Error("Failed to like photo");
+      throw new Error(`サーバーエラー: ${response.statusText}`);
     }
     const data = await response.json();
     console.log("Like updated:", data);
 
     const likeCountEl = document.getElementById(`likeCount-${photo_id}`);
     if (likeCountEl) {
-      likeCountEl.textContent = data.likes;
+      // APIからのレスポンスに含まれるlikes数で更新
+      likeCountEl.textContent = data.likes != null ? data.likes : 0;
     }
+
+    // いいね成功時、ボタンのアイコンを黄色に変更
+    const likeIcon = buttonElement.querySelector('.like-icon');
+    if (likeIcon) {
+        likeIcon.classList.add('liked'); // likedクラスを追加
+    }
+
   } catch (error) {
     console.error("いいね失敗:", error);
-    alert("いいねに失敗しました");
+    alert("いいねに失敗しました。\n" + error.message);
   }
 }
-
 
 /**************************************************/
 /* 8) 拡大表示 (モーダル)                         */
@@ -249,20 +267,20 @@ function showModal(imageUrl) {
     return;
   }
   modalImg.src = imageUrl;
-  modalContainer.style.display = "flex";
+  modalContainer.style.display = "flex"; // モーダルを表示
 }
 
 // 「X」ボタンでモーダル閉じる
 modalCloseBtn.addEventListener("click", () => {
   modalContainer.style.display = "none";
-  modalImg.src = "";
+  modalImg.src = ""; // 画像ソースをクリア
 });
 
 // 背景クリックでも閉じる
 modalContainer.addEventListener("click", (e) => {
-  if (e.target === modalContainer) {
+  if (e.target === modalContainer) { // モーダルの背景部分がクリックされた場合のみ
     modalContainer.style.display = "none";
-    modalImg.src = "";
+    modalImg.src = ""; // 画像ソースをクリア
   }
 });
 
@@ -275,18 +293,6 @@ const selectedFileDisplay = document.getElementById("selectedFileDisplay");
 const selectedFileNameSpan = document.getElementById("selectedFileName");
 const uploadButton = document.getElementById("uploadButton"); // アップロードボタン
 const clearSelectionButton = document.getElementById("clearSelectionButton"); // 「×」ボタン
-
-// アップロードボタンがクリックされたらファイル選択ダイアログを開く
-uploadButton.addEventListener("click", () => {
-    // アップロードボタンが有効な場合のみ、ファイル選択ダイアログを開く
-    // （ファイル選択済みで「アップロード」として機能している時は、そのままhandlePhotoUploadへ）
-    if (!uploadButton.disabled && photoInput.files.length === 0) {
-        photoInput.click();
-    } else if (photoInput.files.length > 0) {
-        // ファイルが選択済みの場合は、そのままアップロード処理を開始
-        handlePhotoUpload();
-    }
-});
 
 // 「＋ 写真を選択」ボタンがクリックされたら、隠れたinput要素をクリック
 selectPhotoButton.addEventListener("click", () => {
@@ -301,9 +307,9 @@ photoInput.addEventListener("change", () => {
     uploadButton.classList.remove("hidden-element"); // アップロードボタンを表示
     uploadButton.disabled = false; // アップロードボタンを有効化
 
-    // メインのアップロードボタンのテキストとアイコンを「アップロード」に戻す（処理中から戻る場合）
-    uploadButton.innerHTML = '<i class="fas fa-camera"></i> アップロード';
-
+    // メインのアップロードボタンのテキストを「アップロード」に戻す（処理中から戻る場合）
+    uploadButton.textContent = "アップロード"; // テキストのみ変更
+    
     // 「＋ 写真を選択」ボタンは、ファイル選択後に表示しておく（ユーザーがファイルを変更できるように）
     selectPhotoButton.classList.remove("hidden-element"); 
     selectPhotoButton.disabled = false; // 「＋ 写真を選択」ボタンを有効に
@@ -312,6 +318,18 @@ photoInput.addEventListener("change", () => {
     resetUploadUI();
   }
 });
+
+// アップロードボタンがクリックされたらファイル選択ダイアログを開く、またはアップロード処理を開始
+uploadButton.addEventListener("click", () => {
+    // ファイルが選択済みの場合、アップロード処理を開始
+    if (photoInput.files.length > 0) {
+        handlePhotoUpload();
+    } else {
+        // ファイルが未選択の場合、「＋ 写真を選択」ボタンと同じ動作でファイル選択ダイアログを開く
+        photoInput.click();
+    }
+});
+
 
 // 「×」ボタンがクリックされたら、選択を解除してUIをリセット
 clearSelectionButton.addEventListener("click", () => {
@@ -327,8 +345,8 @@ function resetUploadUI() {
   // アップロードボタンは初期状態では隠れていて、ファイル選択後に表示される
   uploadButton.classList.add("hidden-element"); // アップロードボタンを隠す
   uploadButton.disabled = true; // アップロードボタンを無効にする
-  // アップロードボタンのテキストとアイコンを元に戻す
-  uploadButton.innerHTML = '<i class="fas fa-camera"></i> アップロード';
+  // アップロードボタンのテキストを元に戻す
+  uploadButton.textContent = "アップロード";
 
   // 「＋ 写真を選択」ボタンのみを表示
   selectPhotoButton.classList.remove("hidden-element"); // 表示

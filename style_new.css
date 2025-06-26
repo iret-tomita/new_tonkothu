@@ -4,23 +4,22 @@
   line-height: 1.6;
   font-weight: 400;
 
-  /* 豚骨ラーメンのメインカラー (画像に合わせて調整) */
+
   --color-base-cream: #FFEFD3; /* 全体背景のクリーム/黄色がかった色 */
   --color-header-bg: #FFE4AC; /* ヘッダー/アップロードセクションの背景色 */
   --color-text-dark: #5C3D2F; /* 濃いテキスト/メインの茶色 */
   --color-upload-button-bg: #CC4C3C; /* アップロードボタンの赤色 */
   --color-upload-button-hover: #E05C4C; /* アップロードボタンのホバー色 */
   --color-accent-red: #D82F2F; /* 紅ショウガのようなアクセントレッド (削除ボタンなどに) */
-  --color-soft-white: #FFFCF7; /* 写真一覧セクションなどの明るい白 */
+  --color-soft-white: #FFFCF7; 
 
-  /* ★追加：豚骨ラーメンの他のカラーもここで定義（もし必要であれば）★ */
   --color-tonkotsu-noodle: #F9E076; /* 麺の色 */
   --color-tonkotsu-chashu: #A04A2F; /* チャーシューの色 */
-  --color-tonkotsu-soup-medium: #F5D7A9; /* スープの中間色 */
+  --color-tonkotsu-soup-medium: #F5D7A9; 
 
   /* いいねボタンの黄色 */
-  --color-like-yellow: #FFD700; /* 金色 */
-  --color-like-yellow-hover: #E0B500; /* 金色のホバー */
+  --color-like-yellow: #FFD700; 
+  --color-like-yellow-hover: #E0B500; 
 
 
   background-color: var(--color-base-cream); /* 全体の背景 */
@@ -54,12 +53,12 @@ body {
 }
 
 /* 豚骨ラーメンのアイコン画像のスタイル */
-.header-icon-image { /* サイズ修正済み */
-  width: 1.8rem;   /* ★調整済みの幅★ */
-  height: 1.8rem;  /* ★調整済みの高さ★ */
-  object-fit: contain;
-  vertical-align: middle;
-  margin-right: 0.5rem;
+.header-icon-image { /* 新しいクラス */
+  width: 2.5rem; /* アイコンの幅を調整 */
+  height: 2.5rem; /* アイコンの高さを調整 */
+  object-fit: contain; /* 画像が歪まないように */
+  vertical-align: middle; /* テキストと高さを揃える */
+  margin-right: 0.5rem; /* テキストとの間隔 */
 }
 
 /* Font Awesome の .header-icon は使用しないため削除しました */
@@ -95,7 +94,6 @@ body {
   gap: 1.5rem; /* 要素間の間隔を調整 */
 }
 
-/* メインのアップロードボタンのスタイルを画像に合わせる */
 .upload-button { /* IDではなくクラスで指定 */
   background-color: var(--color-upload-button-bg); /* 赤っぽいボタン色 */
   color: var(--color-soft-white); /* 白いテキスト */
@@ -119,8 +117,8 @@ body {
 
 .upload-button:hover {
   background-color: var(--color-upload-button-hover); /* ホバー色 */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* ホバー時の影をさらに強く */
-  transform: translateY(-3px); /* 少し大きく浮き上がる */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); 
+  transform: translateY(-3px); 
 }
 
 .upload-button:disabled {
@@ -132,7 +130,7 @@ body {
   transform: none;
 }
 
-/* ★「＋ 写真を選択」とファイル名表示関連のスタイルは維持しつつ、配置を調整★ */
+
 .file-input-container {
   display: flex;
   flex-direction: column; /* 縦に並べる */
@@ -289,7 +287,7 @@ body {
   transform: translateY(-1px);
 }
 
-.action-area, /* action-areaは現在使用されていません */
+.action-area,
 .action-bar {
   display: flex;
   align-items: center;
@@ -383,7 +381,7 @@ body {
   .header {
     background-color: var(--color-header-bg-dark);
   }
-  .header-icon, /* Font Awesomeアイコンのスタイル (ダークモード) */
+  .header-icon,
   .header h1 {
     color: var(--color-text-light-dark);
   }
@@ -477,15 +475,14 @@ body {
 /* 画像拡大用モーダルのCSS  */
 /* ======================== */
 #modalContainer {
-  /* displayはJavaScriptで制御される */
   position: fixed;
-  z-index: 9999; /* 最前面に表示 */
+  z-index: 9999;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8); /* 半透明の黒背景 */
-  display: flex; /* flexboxでコンテンツを中央寄せ */
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
   justify-content: center;
   align-items: center;
 }
@@ -496,10 +493,10 @@ body {
   padding: 1.5rem;
   border-radius: 1rem;
   width: 90%;
-  max-width: 800px; /* 最大幅 */
-  max-height: 90vh; /* 最大高さ */
-  overflow: auto; /* コンテンツがはみ出したらスクロール */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* 強めの影 */
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 #modalCloseBtn {
@@ -510,17 +507,11 @@ body {
   font-size: 1.6rem;
   font-weight: bold;
   background: var(--color-header-bg);
-  border-radius: 50%; /* 円形ボタン */
+  border-radius: 50%;
   padding: 0.4rem 0.8rem;
   color: var(--color-text-dark);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
-  display: flex; /* 文字の中央揃え */
-  justify-content: center;
-  align-items: center;
-  width: 2.5rem; /* ボタンのサイズ調整 */
-  height: 2.5rem; /* ボタンのサイズ調整 */
-  line-height: 1; /* 行の高さを1に設定してテキストを中央に */
 }
 
 #modalCloseBtn:hover {
@@ -528,12 +519,13 @@ body {
     transform: scale(1.1);
 }
 
+
 #modalImg {
   display: block;
   width: auto;
   height: auto;
   margin: 0 auto;
   max-width: 100%;
-  max-height: 80vh; /* ビューポート高さの80% */
+  max-height: 80vh;
   border-radius: 0.75rem;
 }
